@@ -79,10 +79,10 @@ __global__ void APPLY_SPECIFIC(ROIAlignForward)(
     Dtype wend = static_cast<Dtype>(pw + 1) * bin_size_w;
 
     // Add roi offsets and clip to input boundaries
-    hstart = min(max(hstart + roi_start_h, 0.), float(height));
-    hend = min(max(hend + roi_start_h, 0.), float(height));
-    wstart = min(max(wstart + roi_start_w, 0.), float(width));
-    wend = min(max(wend + roi_start_w, 0.), float(width));
+    hstart = min(max(hstart + roi_start_h, 0.), static_cast<float>(height));
+    hend = min(max(hend + roi_start_h, 0.), static_cast<float>(height));
+    wstart = min(max(wstart + roi_start_w, 0.), static_cast<float>(width));
+    wend = min(max(wend + roi_start_w, 0.), static_cast<float>(width));
     bool is_empty = (hend <= hstart) || (wend <= wstart);
 
     // Define an empty pooling region to be zero
@@ -94,15 +94,15 @@ __global__ void APPLY_SPECIFIC(ROIAlignForward)(
     for (Dtype h = hstart; h < hend; h += 1.) {
       for (Dtype w = wstart; w < wend; w += 1.) {
         // Selecting four regular locations for bilinear interpolation
-        Dtype x_left = floor(w);
-        Dtype x_right = ceil(w);
-        Dtype y_bottom = floor(h);
-        Dtype y_top = ceil(h);
+        int x_left = floor(w);
+        int x_right = ceil(w);
+        int y_bottom = floor(h);
+        int y_top = ceil(h);
 
-        int top_left_index = static_cast<int>(y_top * width + x_left);
-        int top_right_index = static_cast<int>(y_top * width + x_right);
-        int bottom_left_index = static_cast<int>(y_bottom * width + x_left);
-        int bottom_right_index = static_cast<int>(y_bottom * width + x_right);
+        int top_left_index = y_top * width + x_left;
+        int top_right_index = y_top * width + x_right;
+        int bottom_left_index = y_bottom * width + x_left;
+        int bottom_right_index = y_bottom * width + x_right;
 
         bool is_top_left_in = x_left >= 0 && x_left <= width - 1
             && y_top >= 0 && y_top <= height - 1;
@@ -197,10 +197,11 @@ __global__ void APPLY_SPECIFIC(ROIAlignBackward)(
       pwstart = min(max(pwstart, 0), pooled_width);
       pwend = min(max(pwend, 0), pooled_width);
 
-      for (int ph = phstart; ph < phend; ++ph) {
-        for (int pw = pwstart; pw < pwend; ++pw) {
-          Dtype max_x = offset_argmax_data_x[ph * pooled_width + pw];
-          Dtype max_y = offset_argmax_data_y[ph * pooled_width + pw];
+      for (int ph = phstart; ph <= phend; ++ph) {
+        for (int pw = pwstart; pw <= pwend; ++pw) {
+          int index = ph * pooled_width + pw;
+          Dtype max_x = offset_argmax_data_x[index];
+          Dtype max_y = offset_argmax_data_y[index];
 
           int x_left = floor(max_x);
           int x_right = ceil(max_x);
