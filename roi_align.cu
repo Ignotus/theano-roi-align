@@ -115,13 +115,13 @@ __global__ void APPLY_SPECIFIC(ROIAlignForward)(
 
         Dtype val = 0;
         if (is_top_left_in)
-          val += (w - x_left) * (y_top - h) * bottom_data[top_left_index];
+          val += (1 - w + x_left) * (1 - y_top + h) * bottom_data[top_left_index];
         if (is_top_right_in)
-          val += (x_right - w) * (y_top - h) * bottom_data[top_right_index];
+          val += (1 - x_right + w) * (1 - y_top + h) * bottom_data[top_right_index];
         if (is_bottom_left_in)
-          val += (w - x_left) * (h - y_bottom) * bottom_data[bottom_left_index];
+          val += (1 - w + x_left) * (1 - h + y_bottom) * bottom_data[bottom_left_index];
         if (is_bottom_right_in)
-          val += (x_right - w) * (h - y_bottom) * bottom_data[bottom_right_index];
+          val += (1 - x_right + w) * (1 - h + y_bottom) * bottom_data[bottom_right_index];
 
         if (val > maxval) {
           maxval = val;
@@ -208,17 +208,17 @@ __global__ void APPLY_SPECIFIC(ROIAlignBackward)(
           int y_top = ceil(max_y);
 
           if (x_left == w && y_top == h)
-            gradient += (max_x - x_left) * (y_top - max_y)
-                * offset_top_diff[ph * pooled_width + pw];
+            gradient += (1 - max_x + x_left) * (1 - y_top + max_y)
+                * offset_top_diff[index];
           else if (x_left == w && y_bottom == h)
-            gradient += (max_x - x_left) * (max_y - y_bottom)
-                * offset_top_diff[ph * pooled_width + pw];
+            gradient += (1 - max_x + x_left) * (1 - max_y + y_bottom)
+                * offset_top_diff[index];
           else if (x_right == w && y_top == h)
-            gradient += (x_right - max_x) * (y_top - max_y)
-                * offset_top_diff[ph * pooled_width + pw];
+            gradient += (1 - x_right + max_x) * (1 - y_top + max_y)
+                * offset_top_diff[index];
           else if (x_right == w && y_bottom == h)
-            gradient += (x_right - max_x) * (max_y - y_bottom)
-                * offset_top_diff[ph * pooled_width + pw];
+            gradient += (1 - x_right + max_x) * (1 - max_y + y_bottom)
+                * offset_top_diff[index];
         }
       }
     }
