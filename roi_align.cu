@@ -65,8 +65,8 @@ __global__ void APPLY_SPECIFIC(ROIAlignForward)(
     Dtype roi_end_w = bottom_rois[3] * spatial_scale;
     Dtype roi_end_h = bottom_rois[4] * spatial_scale;
 
-    Dtype roi_width = roi_end_w - roi_start_w + 1;
-    Dtype roi_height = roi_end_h - roi_start_h + 1;
+    Dtype roi_width = roi_end_w - roi_start_w;
+    Dtype roi_height = roi_end_h - roi_start_h;
 
     Dtype bin_size_h = static_cast<Dtype>(roi_height)
                        / static_cast<Dtype>(pooled_height);
@@ -160,10 +160,10 @@ __global__ void APPLY_SPECIFIC(ROIAlignBackward)(
       }
 
       // And it assumes that we don't have any negative offset of course
-      int roi_start_w = floor(offset_bottom_rois[1] * spatial_scale);
-      int roi_start_h = floor(offset_bottom_rois[2] * spatial_scale);
-      int roi_end_w = ceil(offset_bottom_rois[3] * spatial_scale);
-      int roi_end_h = ceil(offset_bottom_rois[4] * spatial_scale);
+      Dtype roi_start_w = offset_bottom_rois[1] * spatial_scale;
+      Dtype roi_start_h = offset_bottom_rois[2] * spatial_scale;
+      Dtype roi_end_w = offset_bottom_rois[3] * spatial_scale);
+      Dtype roi_end_h = offset_bottom_rois[4] * spatial_scale;
 
       // Skip if ROI doesn't include (h, w)
       const bool in_roi = (w >= roi_start_w && w <= roi_end_w &&
@@ -179,8 +179,8 @@ __global__ void APPLY_SPECIFIC(ROIAlignBackward)(
 
       // Compute feasible set of pooled units that could have pooled
       // this bottom unit
-      Dtype roi_width = roi_end_w - roi_start_w + 1;
-      Dtype roi_height = roi_end_h - roi_start_h + 1;
+      Dtype roi_width = roi_end_w - roi_start_w;
+      Dtype roi_height = roi_end_h - roi_start_h;
 
       Dtype bin_size_h = static_cast<Dtype>(roi_height)
                          / static_cast<Dtype>(pooled_height);
