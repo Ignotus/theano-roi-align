@@ -95,9 +95,7 @@ __global__ void APPLY_SPECIFIC(ROIAlignForward)(
       for (Dtype w = wstart; w < wend; w += 1.) {
         // Selecting four regular locations for bilinear interpolation
         int x_left = floor(w);
-        int x_right = ceil(w);
         int y_bottom = floor(h);
-        int y_top = ceil(h);
 
         int top_left_index = y_top * width + x_left;
         int top_right_index = y_top * width + x_right;
@@ -115,13 +113,13 @@ __global__ void APPLY_SPECIFIC(ROIAlignForward)(
 
         Dtype val = 0;
         if (is_top_left_in)
-          val += (1 - w + x_left) * (1 - y_top + h) * bottom_data[top_left_index];
+          val += (1 - w + x_left) * (h - y_bottom) * bottom_data[top_left_index]; 
         if (is_top_right_in)
-          val += (1 - x_right + w) * (1 - y_top + h) * bottom_data[top_right_index];
+          val += (w - x_left) * (h - y_bottom) * bottom_data[top_right_index]; 
         if (is_bottom_left_in)
-          val += (1 - w + x_left) * (1 - h + y_bottom) * bottom_data[bottom_left_index];
+          val += (1 - w + x_left) * (1 - h + y_bottom) * bottom_data[bottom_left_index]; 
         if (is_bottom_right_in)
-          val += (1 - x_right + w) * (1 - h + y_bottom) * bottom_data[bottom_right_index];
+          val += (w - x_left) * (1 - h + y_bottom) * bottom_data[bottom_right_index]; 
 
         if (val > maxval) {
           maxval = val;
