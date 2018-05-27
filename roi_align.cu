@@ -96,6 +96,8 @@ __global__ void APPLY_SPECIFIC(ROIAlignForward)(
         // Selecting four regular locations for bilinear interpolation
         int x_left = floor(w);
         int y_bottom = floor(h);
+        int x_right = x_left + 1;
+        int y_top = y_bottom + 1;
 
         int top_left_index = y_top * width + x_left;
         int top_right_index = y_top * width + x_right;
@@ -113,13 +115,13 @@ __global__ void APPLY_SPECIFIC(ROIAlignForward)(
 
         Dtype val = 0;
         if (is_top_left_in)
-          val += (1 - w + x_left) * (h - y_bottom) * bottom_data[top_left_index]; 
+          val += (1 - w + x_left) * (h - y_bottom) * bottom_data[top_left_index];
         if (is_top_right_in)
-          val += (w - x_left) * (h - y_bottom) * bottom_data[top_right_index]; 
+          val += (w - x_left) * (h - y_bottom) * bottom_data[top_right_index];
         if (is_bottom_left_in)
-          val += (1 - w + x_left) * (1 - h + y_bottom) * bottom_data[bottom_left_index]; 
+          val += (1 - w + x_left) * (1 - h + y_bottom) * bottom_data[bottom_left_index];
         if (is_bottom_right_in)
-          val += (w - x_left) * (1 - h + y_bottom) * bottom_data[bottom_right_index]; 
+          val += (w - x_left) * (1 - h + y_bottom) * bottom_data[bottom_right_index];
 
         if (val > maxval) {
           maxval = val;
@@ -202,9 +204,9 @@ __global__ void APPLY_SPECIFIC(ROIAlignBackward)(
           Dtype max_y = offset_argmax_data_y[index];
 
           int x_left = floor(max_x);
-          int x_right = ceil(max_x);
+          int x_right = x_left + 1;
           int y_bottom = floor(max_y);
-          int y_top = ceil(max_y);
+          int y_top = y_bottom + 1;
 
           if (x_left == w && y_top == h)
             gradient += (1 - max_x + x_left) * (1 - y_top + max_y)

@@ -22,3 +22,4 @@ rois = np.array([[0, 0, 0, 3, 3],
                  [0, 0, 0, 7, 7]]).astype(np.single)
 
 outs = f(data, rois)
+print(outs)
